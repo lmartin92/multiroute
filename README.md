@@ -19,3 +19,6 @@ lua mroute.lua [COMMAND]
 
 where [COMMAND] is the command to bring up the new network
 
+currently, this does nothing but list properties of the network
+from whence it was started till it reaches end of execution.
+
