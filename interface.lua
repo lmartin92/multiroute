@@ -265,13 +265,21 @@ interface_enumerator.enumerate = function(self, refresh)
     return interfaces
 end
 
-local ifaces = interface_enumerator.new()
-ifaces:enumerate()
-for _, v in pairs(ifaces.interfaces) do
-    print("name: " .. v:get("name"))
-    print("ip: " .. v:get("ip")) 
-    print("gw: " .. v:get("gw"))
-    print("nm: " .. v:get("nm"))
-    print("default:" .. v:get("default"))
-    print()
+local function test()
+    local ifaces = interface_enumerator.new()
+    ifaces:enumerate()
+    for _, v in pairs(ifaces.interfaces) do
+        print("name: " .. v:get("name"))
+        print("ip: " .. v:get("ip")) 
+        print("gw: " .. v:get("gw"))
+        print("nm: " .. v:get("nm"))
+        print("default:" .. v:get("default"))
+        print()
+    end
 end
+
+return 
+    {
+        new = interface_enumerator.new,
+        test = test
+    }
