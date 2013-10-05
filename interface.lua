@@ -1,30 +1,50 @@
+-- This is the interface library
+-- it's job is to enumerate every interface it can find
+-- in iproute show and hand it to the libraries user
+-- as something useable from within lua
+--
+-- usage:
+--      local interface_enumerator = require("interface")
+--      see test function for the rest of the example
+
 local interface_enumerator = {}
 local interface = {}
 
+--------------------------------------------------------------------
 -- returns a new interface, pretty much an internal function
 -- sets it up just enough for dynamic initialization upon
 -- accessing its properties
+--------------------------------------------------------------------
 interface.new = function(name, inheritance)
     return
     {
-        name = name,
+        -- interface name
+        name = name, 
+        -- interface internals
         vals =
         {
             routes = inheritance.routes,
             ips = inheritance.ips
         },
+        -- method to get information about the interface
         get = interface.get,
+        -- internal method used by the interface
+        -- for the get method
         parse = interface.parse,
     }
 end
 
+--------------------------------------------------------------------
 -- gets the gw, nm, ip, name, and default, all of which
 -- are properties of an interface
 -- returns a string which is the value of one of those properties
+--------------------------------------------------------------------
 interface.get = function(self, what)
+    ----------------------------------------------------------------
     -- internal function to turn the table
     -- returned by the other internal functions into
     -- a single value
+    ----------------------------------------------------------------
     local function get_results()
         local res = self:parse(what)
         res = res or { none = "none" }
@@ -36,11 +56,15 @@ interface.get = function(self, what)
     return self.vals[what]
 end
 
+--------------------------------------------------------------------
 -- parses the text file looking for "what" in respect to the 
 -- interface to which this method belongs
+--------------------------------------------------------------------
 interface.parse = function(self, what)
+    ----------------------------------------------------------------
     -- returns a table containing net mask of this interface
     -- returns nil if can't find it
+    ----------------------------------------------------------------
     local function nm()
         local ret = {}
         local set = false
@@ -68,8 +92,10 @@ interface.parse = function(self, what)
         return ret
     end
 
+    ----------------------------------------------------------------
     -- returns a table containing the gateway
     -- returns nill if can't be found
+    ----------------------------------------------------------------
     local function gw()
         local ret = {}
 
@@ -99,8 +125,10 @@ interface.parse = function(self, what)
         return ret
     end
 
+    ----------------------------------------------------------------
     -- returns a table telling us this interface has the default     
     -- route, returns nill if can't be found
+    ----------------------------------------------------------------
     local function default()
         local ret = { "false" }
 
@@ -115,10 +143,14 @@ interface.parse = function(self, what)
         return ret
     end
 
+    ----------------------------------------------------------------
     -- returns a table telling us this interface's ip
     -- returns nil if can't be found
+    ----------------------------------------------------------------
     local function ip()
+        ------------------------------------------------------------
         -- turns an ip into octets and then into an integer
+        ------------------------------------------------------------
         local function itol(ip_ip)
             if ip_ip == nil then
                 return nil
@@ -136,12 +168,16 @@ interface.parse = function(self, what)
             return ret
         end
 
+        ------------------------------------------------------------
         -- tests an ip to see if it is within a net mask
+        ------------------------------------------------------------
         local function in_nm(ip, net, mask)
             return bit32.band(itol(ip), mask) == net
         end
 
+        ------------------------------------------------------------
         -- generates a netmask from CIDR form
+        ------------------------------------------------------------
         local function genmask(mask)
             mask = mask or 0
             return bit32.lshift(0xFFFFFFF, 32 - mask)
@@ -175,7 +211,9 @@ interface.parse = function(self, what)
         return ret
     end
 
+    ----------------------------------------------------------------
     -- returns the name of this interface
+    ----------------------------------------------------------------
     local function name()
         return { name = self.name }
     end
@@ -192,8 +230,10 @@ interface.parse = function(self, what)
     return funcs[what]()
 end
 
+--------------------------------------------------------------------
 -- creates a new interface enumerator, fills it with enough
 -- just to start off
+--------------------------------------------------------------------
 interface_enumerator.new = function()
     local t =
     {
@@ -205,7 +245,9 @@ interface_enumerator.new = function()
     return t
 end
 
+--------------------------------------------------------------------
 -- enumerates the devices found in ip route
+--------------------------------------------------------------------
 interface_enumerator.enumerate = function(self, refresh)
 
     -- gets text from a file in a table of lines
@@ -265,6 +307,9 @@ interface_enumerator.enumerate = function(self, refresh)
     return interfaces
 end
 
+--------------------------------------------------------------------
+-- the test function, used for debugging, and as an example
+--------------------------------------------------------------------
 local function test()
     local ifaces = interface_enumerator.new()
     ifaces:enumerate()
