@@ -60,6 +60,11 @@ interface.parse = function(self, what)
             ret = nil
         end
 
+        local mask = ret[1]:match("%d+.%d+.%d+.%d+/(%d+)")
+        if mask == nil then
+            ret[1] = ret[1]:match("(%d+.%d+.%d+.%d+)") .. "/24"
+        end
+
         return ret
     end
 
@@ -146,9 +151,6 @@ interface.parse = function(self, what)
         local gw = self:get("gw"):match("(%d+%.%d+%.%d+%.%d+)")
         local ip_pattern = "(%d+%.%d+%.%d+%.%d+)"
         local ip_nm = self:get("nm")
---        if ip_nm == nil then
---            return nil
---        end
         local net, mask = ip_nm:match("(%d+%.%d+%.%d+%.%d+)/(%d+)")
         local hnet = itol(net)
         local set = false
@@ -158,7 +160,8 @@ interface.parse = function(self, what)
                 if  in_nm(m, hnet, genmask(mask)) and
                     m ~= net and
                     m ~= gw and
-                    set ~= true then
+                    set ~= true and
+                    l:find("via") == nil then
                     set = true
                     table.insert(ret,m)
                 end
