@@ -43,17 +43,21 @@ interface.parse = function(self, what)
     -- returns nil if can't find it
     local function nm()
         local ret = {}
+        local set = false
 
         for i, l in ipairs(self.vals["routes"]) do
             if  l:find("dev") and
-                l:find("proto") and
-                l:find("kernel") and
                 l:find("scope") and
                 l:find("link") and
                 l:find("src") and
                 l:find(self:get("name")) then
                 table.insert(ret, l:sub(0, l:find("dev") - 1))
+                set = true
             end
+        end
+
+        if set == false then
+            ret = nil
         end
 
         return ret
@@ -111,6 +115,10 @@ interface.parse = function(self, what)
     local function ip()
         -- turns an ip into octets and then into an integer
         local function itol(ip_ip)
+            if ip_ip == nil then
+                return nil
+            end
+
             local ret = 0
             local octets = {}
             octets = { ip_ip:match("(%d+)%.(%d+)%.(%d+)%.(%d+)") }
@@ -138,6 +146,9 @@ interface.parse = function(self, what)
         local gw = self:get("gw"):match("(%d+%.%d+%.%d+%.%d+)")
         local ip_pattern = "(%d+%.%d+%.%d+%.%d+)"
         local ip_nm = self:get("nm")
+--        if ip_nm == nil then
+--            return nil
+--        end
         local net, mask = ip_nm:match("(%d+%.%d+%.%d+%.%d+)/(%d+)")
         local hnet = itol(net)
         local set = false
@@ -148,13 +159,14 @@ interface.parse = function(self, what)
                     m ~= net and
                     m ~= gw and
                     set ~= true then
+                    set = true
                     table.insert(ret,m)
                 end
             end
         end
 
         if set == false then
-            table.insert(ret, "NONE")
+            ret = nil
         end
 
         return ret
@@ -192,6 +204,7 @@ end
 
 -- enumerates the devices found in ip route
 interface_enumerator.enumerate = function(self, refresh)
+
     -- gets text from a file in a table of lines
     local function get_text(what)
         local ret = {}
@@ -253,7 +266,7 @@ local ifaces = interface_enumerator.new()
 ifaces:enumerate()
 for _, v in pairs(ifaces.interfaces) do
     print("name: " .. v:get("name"))
-    print("ip: " .. v:get("ip"))
+    print("ip: " .. v:get("ip")) 
     print("gw: " .. v:get("gw"))
     print("nm: " .. v:get("nm"))
     print("default:" .. v:get("default"))
