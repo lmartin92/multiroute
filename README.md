@@ -1,8 +1,9 @@
 multiroute
 ==========
 
-This project takes a computer and goes thru it in a couple of
-different states.
+This project when ran takes a computer, reads its current network
+state, and observes changes based on what it is told to execute, such
+that it can make changes to the networking states itself.
 When started, only the original interfaces will be up, and it will
 be given a command meant to bring up further interfaces.
 When it brings up more interfaces it will tell the difference between
