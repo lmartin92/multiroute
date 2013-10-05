@@ -1,1 +1,2 @@
-can't pull ip correctly for tun0, nor netmask, need to check and refine
+can't pull ip correctly for tun0, nor netmask, need to check and refine -- FIXED
+need to start building up the route builder
