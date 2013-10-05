@@ -59,6 +59,8 @@ interface.parse = function(self, what)
         return ret
     end
 
+    -- returns a table containing the gateway
+    -- returns nill if can't be found
     local function gw()
         local ret = {}
 
@@ -88,6 +90,8 @@ interface.parse = function(self, what)
         return ret
     end
 
+    -- returns a table telling us this interface has the default     
+    -- route, returns nill if can't be found
     local function default()
         local ret = { "false" }
 
@@ -102,7 +106,10 @@ interface.parse = function(self, what)
         return ret
     end
 
+    -- returns a table telling us this interface's ip
+    -- returns nil if can't be found
     local function ip()
+        -- turns an ip into octets and then into an integer
         local function itol(ip_ip)
             local ret = 0
             local octets = {}
@@ -116,10 +123,12 @@ interface.parse = function(self, what)
             return ret
         end
 
+        -- tests an ip to see if it is within a net mask
         local function in_nm(ip, net, mask)
             return bit32.band(itol(ip), mask) == net
         end
 
+        -- generates a netmask from CIDR form
         local function genmask(mask)
             mask = mask or 0
             return bit32.lshift(0xFFFFFFF, 32 - mask)
@@ -151,6 +160,7 @@ interface.parse = function(self, what)
         return ret
     end
 
+    -- returns the name of this interface
     local function name()
         return { name = self.name }
     end
@@ -167,6 +177,8 @@ interface.parse = function(self, what)
     return funcs[what]()
 end
 
+-- creates a new interface enumerator, fills it with enough
+-- just to start off
 interface_enumerator.new = function()
     local t =
     {
