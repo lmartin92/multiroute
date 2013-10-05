@@ -13,6 +13,8 @@ same interface, same going for traffic sent.
 Usage:
 
 clone this git repo
+
 lua mroute.lua [COMMAND]
+
 where [COMMAND] is the command to bring up the new network
 
