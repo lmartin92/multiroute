@@ -281,9 +281,15 @@ end
 interface_enumerator.new = function()
     local t =
     {
+        -- internal, routes from ip route show 
+        -- (raw text line divided)
         routes = nil,
+        -- internal, ips from ip addr show (raw text line divided)
         ips = nil,
+        -- every interface sparsely initialized
         interfaces = {},
+        -- method to enumerate the interfaces available in
+        -- ip route show, does the sparse init of interfaces table
         enumerate = interface_enumerator.enumerate
     }
     return t
@@ -291,10 +297,13 @@ end
 
 --------------------------------------------------------------------
 -- enumerates the devices found in ip route
+-- refresh argument is ignored for now 
 --------------------------------------------------------------------
 interface_enumerator.enumerate = function(self, refresh)
 
+    ----------------------------------------------------------------
     -- gets text from a file in a table of lines
+    ----------------------------------------------------------------
     local function get_text(what)
         local ret = {}
         local tf
@@ -319,6 +328,9 @@ interface_enumerator.enumerate = function(self, refresh)
         return ret
     end
 
+    ----------------------------------------------------------------
+    -- finds every interface within ip routes show
+    ----------------------------------------------------------------
     local function get_interfaces()
         local ret = {}
 
